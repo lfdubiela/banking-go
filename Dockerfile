@@ -1,10 +1,10 @@
-FROM golang:1.14-alpine AS build
+FROM golang:1.14
 
-WORKDIR /src/
-COPY main.go go.* /src/
-RUN CGO_ENABLED=0 go build -o /bin/app
+WORKDIR /app
+COPY ./ /app
 
-FROM scratch
-COPY --from=build /bin/app /bin/app
-ENTRYPOINT ["/bin/app"]
+RUN go mod download
+RUN go mod vendor
+RUN go get github.com/githubnemo/CompileDaemon
 
+ENTRYPOINT CompileDaemon --build="go build main.go" --command=./main

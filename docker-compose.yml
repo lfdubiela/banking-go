@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: transfer-api-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "transfer-api"
+      MYSQL_USER: "name"
+      MYSQL_PASSWORD: "password"
+    volumes:
+      - ./resources/migration:/docker-entrypoint-initdb.d/:ro
+    ports:
+      - "3306:3306"
+
+  app:
+    container_name: transfer-api-app
+    build: ./
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./:/app
+    env_file:
+      - resources/.env
+    depends_on:
+      - mysql

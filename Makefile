@@ -1,8 +1,11 @@
-build:
-	- docker image build -t transfer-api .
+pwd = $(shell pwd)
 
-run:
-	- docker container run -p 8888:8888 transfer-api fresh
+start-all:
+	- docker-compose up
 
-fresh:
-	- docker run transfer-api
+# caso os containers "travem a roda"
+stop-all:
+	- docker stop $(docker ps -a -q)
+
+remove-all:
+	- docker rm $(docker ps -a -q)
