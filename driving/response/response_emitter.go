@@ -37,6 +37,14 @@ func (e Response) InternalServerError(p interface{}) {
 	e.Json(http.StatusInternalServerError, p)
 }
 
+func (e Response) UnprocessableEntity(p interface{}) {
+	e.Json(http.StatusUnprocessableEntity, p)
+}
+
+func (e Response) NotFound(p interface{}) {
+	e.Json(http.StatusNotFound, p)
+}
+
 func (e Response) Created(p interface{}) {
 	e.Json(http.StatusCreated, p)
 }

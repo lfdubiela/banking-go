@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+
 	"github.com/lfdubiela/banking-go/domain/entity"
 	"github.com/lfdubiela/banking-go/domain/vo"
 )
@@ -18,7 +19,7 @@ func NewTransactionRepository(db *sql.DB) TransactionRepository {
 	return TransactionRepository{db}
 }
 
-func (r TransactionRepository) Save(t entity.Transaction) (*vo.Id, error) {
+func (r TransactionRepository) Save(t *entity.Transaction) (*vo.Id, error) {
 	query := `
 		INSERT INTO transaction (account_id, operation_id, amount, event_date) 
 		VALUES (?, ?, ?, ?)

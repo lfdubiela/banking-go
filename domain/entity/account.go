@@ -35,14 +35,14 @@ func (a Account) WithId(id *vo.Id) *Account {
 }
 
 type AccountFinder interface {
-	Find(id vo.Id) (*Account, error)
+	Find(id *vo.Id) (*Account, error)
 }
 
 type AccountSaver interface {
-	Save(a Account) (*vo.Id, error)
+	Save(a *Account) (*vo.Id, error)
 }
 
-func FindAccount(r AccountFinder, id vo.Id) (*Account, error) {
+func FindAccount(r AccountFinder, id *vo.Id) (*Account, error) {
 	account, err := r.Find(id)
 
 	if err != nil {
@@ -52,7 +52,7 @@ func FindAccount(r AccountFinder, id vo.Id) (*Account, error) {
 	return account, nil
 }
 
-func (a Account) Save(r AccountSaver) (*Account, error) {
+func (a *Account) Save(r AccountSaver) (*Account, error) {
 	id, err := r.Save(a)
 
 	if err != nil {

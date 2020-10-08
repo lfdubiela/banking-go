@@ -9,3 +9,9 @@ stop-all:
 
 remove-all:
 	- docker rm $(docker ps -a -q)
+
+test:
+	go test -covermode="count" ./...
+
+test-coverage:
+	go test -v -cover ./... && sensible-browser $(pwd)/report/coverage.html

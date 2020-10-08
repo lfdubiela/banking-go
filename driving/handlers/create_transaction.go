@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"io/ioutil"
+	"net/http"
+
+	"github.com/lfdubiela/banking-go/driven/repository"
+
 	"github.com/lfdubiela/banking-go/domain/entity"
 	"github.com/lfdubiela/banking-go/driving/request"
 	"github.com/lfdubiela/banking-go/driving/response"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
 
 type CreateTransaction struct {
@@ -22,9 +24,9 @@ func NewCreateTransaction(
 
 func (t CreateTransaction) Handler(w http.ResponseWriter, r *http.Request) {
 	emitter := response.NewResponseEmitter(w)
-	payload, _ := ioutil.ReadAll(r.Body)
+	body, _ := ioutil.ReadAll(r.Body)
 
-	request, err := request.NewCreateTransaction(payload)
+	payload, err := request.NewCreateTransaction(body)
 
 	if err != nil {
 		responseError := response.NewErrorResponse(map[string]string{"request.body": "invalid payload"})
@@ -34,28 +36,34 @@ func (t CreateTransaction) Handler(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	if errs := request.Validate(); errs != nil {
+	if errs := payload.Validate(); errs != nil {
 		responseError := response.NewErrorResponse(errs)
 		emitter.BadRequest(responseError)
 		return
 	}
 
-	//todo corrigir erro pode retonar erro de 421 aqui
-	transaction, _ := entity.NewTransction(
-		request.AccountId,
-		request.OperationId,
-		request.Amount,
+	transaction, err := entity.NewTransction(
+		payload.AccountId,
+		payload.OperationId,
+		payload.Amount,
 		t.accountFinder)
 
-	transaction, err = transaction.Save(t.saver)
+	if err != nil {
+		if notFound, ok := err.(*repository.AccountNotFound); ok {
+			emitter.UnprocessableEntity(
+				response.NewErrorResponse(map[string]string{"request.body.account_id": notFound.Error()}))
+			return
+		}
+		emitter.InternalServerError(nil)
+		return
+	}
 
-	log.Print(transaction, err)
+	transaction, err = transaction.Save(t.saver)
 
 	if err != nil {
 		emitter.InternalServerError(nil)
 		return
 	}
 
-	response := response.NewTransactionResponse(transaction)
-	emitter.Created(response)
+	emitter.Created(response.NewTransactionResponse(transaction))
 }

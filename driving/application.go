@@ -3,14 +3,14 @@ package driving
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
-	"github.com/lfdubiela/banking-go/driven/repository"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
+	"github.com/lfdubiela/banking-go/driven/repository"
 	"github.com/lfdubiela/banking-go/driving/handlers"
 	"github.com/lfdubiela/banking-go/driving/middlewares"
 )
@@ -55,7 +55,7 @@ func (a Application) run(addr string) {
 
 	a.registerHandlers()
 
-	fmt.Println("Listening to port " + addr)
+	log.Println("Listening to port " + addr)
 
 	server := &http.Server{
 		Handler:      a.router,

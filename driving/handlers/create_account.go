@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"io/ioutil"
+	"net/http"
+
 	"github.com/lfdubiela/banking-go/domain/entity"
 	"github.com/lfdubiela/banking-go/driven/repository"
 	"github.com/lfdubiela/banking-go/driving/request"
 	"github.com/lfdubiela/banking-go/driving/response"
-	"io/ioutil"
-	"net/http"
 )
 
 type CreateAccount struct {
@@ -19,34 +20,30 @@ func NewCreateAccount(saver entity.AccountSaver) CreateAccount {
 
 func (c CreateAccount) Handler(w http.ResponseWriter, r *http.Request) {
 	emitter := response.NewResponseEmitter(w)
-	payload, _ := ioutil.ReadAll(r.Body)
+	body, _ := ioutil.ReadAll(r.Body)
 
-	request, err := request.NewCreateAccount(payload)
+	payload, err := request.NewCreateAccount(body)
 
 	if err != nil {
-		responseError := response.NewErrorResponse(map[string]string{"request.body": "invalid payload"})
-		emitter.BadRequest(responseError)
+		emitter.BadRequest(response.NewErrorResponse(map[string]string{"request.body": "invalid payload"}))
 		return
 	}
 
 	defer r.Body.Close()
 
-	if errs := request.Validate(); errs != nil {
+	if errs := payload.Validate(); errs != nil {
 		responseError := response.NewErrorResponse(errs)
 		emitter.BadRequest(responseError)
 		return
 	}
 
 	//todo
-	account, _ := entity.NewAccount(request.Document)
+	account, _ := entity.NewAccount(payload.Document)
 	account, err = account.Save(c.saver)
 
 	if err != nil {
-		errExists, ok := err.(*repository.AccountAlreadyExists)
-
-		if ok {
-			responseError := response.NewErrorResponse(map[string]string{"request.body": errExists.Error()})
-			emitter.Conflict(responseError)
+		if errExists, ok := err.(*repository.AccountAlreadyExists); ok {
+			emitter.Conflict(response.NewErrorResponse(map[string]string{"request.body": errExists.Error()}))
 			return
 		}
 
@@ -54,6 +51,5 @@ func (c CreateAccount) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := response.NewAccountResponse(account)
-	emitter.Created(response)
+	emitter.Created(response.NewAccountResponse(account))
 }

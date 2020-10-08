@@ -1,8 +1,9 @@
 package entity
 
 import (
-	"github.com/lfdubiela/banking-go/domain/vo"
 	"time"
+
+	"github.com/lfdubiela/banking-go/domain/vo"
 )
 
 type Transaction struct {
@@ -48,7 +49,7 @@ func (t Transaction) WithId(id *vo.Id) *Transaction {
 }
 
 type TransactionSaver interface {
-	Save(t Transaction) (*vo.Id, error)
+	Save(t *Transaction) (*vo.Id, error)
 }
 
 func NewTransction(
@@ -63,7 +64,7 @@ func NewTransction(
 		return nil, err
 	}
 
-	account, err := FindAccount(repository, *id)
+	account, err := FindAccount(repository, id)
 
 	if err != nil {
 		return nil, err
@@ -89,7 +90,7 @@ func NewTransction(
 	}, nil
 }
 
-func (t Transaction) Save(r TransactionSaver) (*Transaction, error) {
+func (t *Transaction) Save(r TransactionSaver) (*Transaction, error) {
 	id, err := r.Save(t)
 
 	if err != nil {
