@@ -4,7 +4,7 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: transfer-api-mysql
+    container_name: banking-go-mysql
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "transfer-api"
@@ -16,7 +16,7 @@ services:
       - "3306:3306"
 
   app:
-    container_name: transfer-api-app
+    container_name: banking-go-app
     build: ./
     dns:
       - 8.8.8.8
