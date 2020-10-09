@@ -29,7 +29,7 @@ banking-go:
 |------|-------> middlewares
 |------|-------> request
 |------\-------> response
-|------> rsources (arquivos e recursos para subir a aplicação)
+|------> resources (arquivos e recursos para subir a aplicação)
 |------\------> migration
 ```
 
