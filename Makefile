@@ -1,9 +1,10 @@
+DOCKER_CONTAINER:= docker exec banking-go-app bash -c
+
 pwd = $(shell pwd)
 
 start-all:
 	- docker-compose up
 
-# caso os containers "travem a roda"
 stop-all:
 	- docker stop $(docker ps -a -q)
 
@@ -11,7 +12,7 @@ remove-all:
 	- docker rm $(docker ps -a -q)
 
 test:
-	go test -covermode="count" ./...
+	$(DOCKER_CONTAINER) 'go test -covermode="count" ./...'
 
 test-coverage:
-	./go-coverage.sh && sensible-browser report/coverage.html
+	$(DOCKER_CONTAINER) './go-coverage.sh' && sensible-browser report/coverage.html
