@@ -19,17 +19,17 @@ Uma vez dito isso, defini a seguinte estrutura:
 
 ```shell
 banking-go:
-|------> domain //(regras de negócio com suas entidades e value objects)
+|------> domain (regras de negócio com suas entidades e value objects)
 |------|-------> entity 
 |------\-------> vo
-|------> driven //(o que é dirigido pelas regras de negócio)
+|------> driven (o que é dirigido pelas regras de negócio)
 |------\-------> repository 
-|------> driving //(regras de interação com usuario, http handlers, validação de payload e afins)
+|------> driving (regras de interação com usuario, http handlers, validação de payload e afins)
 |------|-------> handlers
 |------|-------> middlewares
 |------|-------> request
 |------\-------> response
-|------> resources //(arquivos e recursos para subir a aplicação)
+|------> resources (arquivos e recursos para subir a aplicação)
 |------\------> migration
 ```
 
