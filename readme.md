@@ -72,5 +72,5 @@ Deste modo, nenhuma transação é registrada com valor monetário negativo.
 
 ## todo
 
-[] terminar os testes unitários 
-[] implementar um caso de teste ponta à ponta
+- [ ] terminar os testes unitários 
+- [ ] implementar um caso de teste ponta à ponta
