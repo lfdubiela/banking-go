@@ -30,11 +30,7 @@ func (t Transaction) Amount() vo.Amount {
 	return t.amount
 }
 
-func (t Transaction) EventDate() time.Time {
-	return t.eventDate
-}
-
-func (t Transaction) EventDateFormated() string {
+func (t Transaction) EventDate() string {
 	return t.eventDate.Format("2006-01-02 15:04:05")
 }
 

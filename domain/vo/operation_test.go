@@ -74,5 +74,6 @@ func equalOperation(a, b *Operation) bool {
 		b == nil || a != nil &&
 		b != nil &&
 		a.Id() == b.Id() &&
-		a.Description() == b.Description()
+		a.Description() == b.Description() &&
+		a.Mode() == b.mode
 }

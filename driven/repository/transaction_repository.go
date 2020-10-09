@@ -35,7 +35,7 @@ func (r TransactionRepository) Save(t *entity.Transaction) (*vo.Id, error) {
 		t.Account().Id().Value(),
 		t.Operation().Id(),
 		t.Amount().Value(),
-		t.EventDateFormated())
+		t.EventDate())
 
 	if err != nil {
 		return nil, err

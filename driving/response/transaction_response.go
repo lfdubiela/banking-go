@@ -26,6 +26,6 @@ func NewTransactionResponse(t *entity.Transaction) *TransactionResponse {
 			Mode: t.Operation().Mode(),
 		},
 		Amount:    t.Amount().Value(),
-		EventDate: t.EventDateFormated(),
+		EventDate: t.EventDate(),
 	}
 }

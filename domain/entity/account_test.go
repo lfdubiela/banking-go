@@ -21,8 +21,11 @@ func TestNewAccount(t *testing.T) {
 		{
 			description:    "Valid values for Account(document:%)",
 			documentNumber: "56295269443",
-			expected:       createAccount("56295269443"),
-			err:            nil,
+			expected: &Account{
+				nil,
+				newDocument("56295269443"),
+			},
+			err: nil,
 		},
 		{
 			description:    "Invalid values for Account(document:%)",
@@ -36,52 +39,64 @@ func TestNewAccount(t *testing.T) {
 		t.Run(fmt.Sprintf(test.description, test.documentNumber), func(t *testing.T) {
 			account, err := NewAccount(test.documentNumber)
 
-			if !reflect.DeepEqual(test.expected, account) {
-				t.Errorf("Expected %v, got %v", test.expected, account)
+			if !reflect.DeepEqual(test.err, err) {
+				t.Errorf("Error expected: %s, received: %s", test.err, err)
+				return
 			}
 
-			if !equalError(test.err, err) {
-				t.Errorf("Expected: %d, got: %d", test.err, err)
+			if err != nil {
+				return
+			}
+
+			if !reflect.DeepEqual(test.expected.Document(), account.Document()) {
+				t.Errorf("Document() expected %v, received %v", test.expected, account.Id())
 			}
 		})
 	}
 }
 
-func TestWithId(t *testing.T) {
+func TestAccountWithId(t *testing.T) {
 	t.Parallel()
 
 	type params struct {
-		id       *vo.Id
+		id       uint64
 		document string
 	}
 
 	tests := []struct {
 		description string
 		params      params
-		account     *Account
-		err         error
+		expected    *Account
 	}{
 		{
 			description: "Valid values for Account(id:%)",
-			params:      params{createId(1), "56295269443"},
-			account:     createAccountAllParams("56295269443", 1),
-			err:         nil,
+			params:      params{1, "56295269443"},
+			expected: &Account{
+				newId(1),
+				newDocument("56295269443"),
+			},
 		},
 		{
 			description: "Valid values for Account(id:%)",
-			params:      params{createId(1000), "56295269443"},
-			account:     createAccountAllParams("56295269443", 1000),
-			err:         nil,
+			params:      params{1, "56295269443"},
+			expected: &Account{
+				newId(1),
+				newDocument("56295269443"),
+			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf(test.description, test.params.id), func(t *testing.T) {
 			account, _ := NewAccount(test.params.document)
-			account = account.WithId(test.params.id)
+			account = account.WithId(newId(test.params.id))
 
-			if !reflect.DeepEqual(account, test.account) {
-				t.Errorf("Expected %v, got %v", test.account, account)
+			if !reflect.DeepEqual(test.expected.Id(), account.Id()) {
+				t.Errorf("Id() expected %v, received %v", test.expected, account.Id())
+			}
+
+			if !reflect.DeepEqual(test.expected.Document(), account.Document()) {
+				t.Errorf("Document() expected %v, received %v", test.expected, account.Id())
 			}
 		})
 	}
@@ -91,7 +106,11 @@ func TestFindAccountSuccess(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Test FindAccount returning success", func(t *testing.T) {
-		testAccount := createAccountAllParams("56295269443", 1)
+		testAccount := &Account{
+			newId(1),
+			newDocument("56295269443"),
+		}
+
 		finder := &accountFinderStub{testAccount}
 
 		id, _ := vo.NewId(1)
@@ -111,9 +130,7 @@ func TestFindAccountFailed(t *testing.T) {
 		expectedError := errors.New("Account not found!")
 		finder := &accountFinderStub{expectedError}
 
-		id, _ := vo.NewId(1)
-
-		_, err := FindAccount(finder, id)
+		_, err := FindAccount(finder, newId(1))
 
 		if !reflect.DeepEqual(expectedError, err) {
 			t.Errorf("Expected %v, got %v", expectedError, err)
@@ -125,10 +142,14 @@ func TestSaveAccountSuccess(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Test Save returning success", func(t *testing.T) {
-		expected := createAccountAllParams("56295269443", 1)
+		expected := &Account{
+			newId(1),
+			newDocument("56295269443"),
+		}
 
-		id, _ := vo.NewId(1)
-		saver := &accountSaverStub{id}
+		saver := &accountSaverStub{
+			newId(1),
+		}
 
 		account, _ := expected.Save(saver)
 
@@ -142,7 +163,11 @@ func TestSaveAccountFailed(t *testing.T) {
 	t.Parallel()
 
 	t.Run("Test Save returning failed", func(t *testing.T) {
-		account := createAccountAllParams("56295269443", 1)
+		account := &Account{
+			newId(1),
+			newDocument("56295269443"),
+		}
+
 		expected := errors.New("Account already exists with document(56295269443)!")
 
 		saver := &accountSaverStub{expected}
@@ -163,9 +188,7 @@ func (a *accountFinderStub) Find(id *vo.Id) (*Account, error) {
 	if err, ok := a.result.(error); ok {
 		return nil, err
 	}
-
 	account, _ := a.result.(*Account)
-
 	return account, nil
 }
 
@@ -183,22 +206,12 @@ func (s *accountSaverStub) Save(a *Account) (*vo.Id, error) {
 	return id, nil
 }
 
-func createAccount(document string) *Account {
-	d, _ := vo.NewDocument(document)
-	return &Account{nil, *d}
+func newId(i uint64) *vo.Id {
+	id, _ := vo.NewId(i)
+	return id
 }
 
-func createAccountAllParams(document string, id uint64) *Account {
-	d, _ := vo.NewDocument(document)
-	i, _ := vo.NewId(id)
-	return &Account{i, *d}
-}
-
-func createId(id uint64) *vo.Id {
-	i, _ := vo.NewId(id)
-	return i
-}
-
-func equalError(a, b error) bool {
-	return a == nil && b == nil || a != nil && b != nil && a.Error() == b.Error()
+func newDocument(n string) vo.Document {
+	doc, _ := vo.NewDocument(n)
+	return *doc
 }

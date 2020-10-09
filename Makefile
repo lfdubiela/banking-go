@@ -14,4 +14,4 @@ test:
 	go test -covermode="count" ./...
 
 test-coverage:
-	go test -v -cover ./... && sensible-browser $(pwd)/report/coverage.html
+	./go-coverage.sh && sensible-browser report/coverage.html
