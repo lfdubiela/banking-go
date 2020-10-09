@@ -11,7 +11,7 @@ Dito isso, para uma melhor organização do codigo, foram utilizadas as seguinte
 Para exemplificar:
  - Driving ou user-side: onde o usuário interage com a aplicação. 
  - Domain ou bussiness logic: onde as regras de negócio devem estar puramente explicitadas nessa camada.
- - Driven ou server-side: onde estão os códigos de infra que são dirigidos pela aplicação, nessa camada normalmente temos interação com banco de dados, definição de serviços externos, normalmente são os "atores" gerenciados pela aplicação.
+ - Driven ou server-side: onde estão os códigos de infra que são dirigidos pela aplicação, nessa camada normalmente temos interação com banco de dados, definição de serviços externos, normalmente são os "atores" gerenciados pelo domain.
  
  veja mais [aqui](https://blog.octo.com/en/hexagonal-architecture-three-principles-and-an-implementation-example/).
  
