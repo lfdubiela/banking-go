@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/lfdubiela/banking-go/driven/repository"
@@ -49,6 +50,11 @@ func (t CreateTransaction) Handler(w http.ResponseWriter, r *http.Request) {
 		t.accountFinder)
 
 	if err != nil {
+		if _, ok := err.(*entity.AccountHasNoSufficientAvailableLimit); ok {
+			emitter.UnprocessableEntity(
+				response.NewErrorResponse(map[string]string{"request.body.account_id": "Account has no sufficient!"}))
+		}
+
 		if notFound, ok := err.(*repository.AccountNotFound); ok {
 			emitter.UnprocessableEntity(
 				response.NewErrorResponse(map[string]string{"request.body.account_id": notFound.Error()}))
@@ -61,6 +67,7 @@ func (t CreateTransaction) Handler(w http.ResponseWriter, r *http.Request) {
 	transaction, err = transaction.Save(t.saver)
 
 	if err != nil {
+		log.Print(err)
 		emitter.InternalServerError(nil)
 		return
 	}

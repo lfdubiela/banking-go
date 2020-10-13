@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/lfdubiela/banking-go/domain/entity"
@@ -37,8 +38,7 @@ func (c CreateAccount) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//todo
-	account, _ := entity.NewAccount(payload.Document)
+	account, _ := entity.NewAccount(payload.Document, payload.CreditLimit, payload.CreditLimit)
 	account, err = account.Save(c.saver)
 
 	if err != nil {
@@ -46,6 +46,8 @@ func (c CreateAccount) Handler(w http.ResponseWriter, r *http.Request) {
 			emitter.Conflict(response.NewErrorResponse(map[string]string{"request.body": errExists.Error()}))
 			return
 		}
+
+		log.Println(err)
 
 		emitter.InternalServerError(nil)
 		return

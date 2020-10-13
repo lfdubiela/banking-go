@@ -78,6 +78,12 @@ func NewTransction(
 		return nil, err
 	}
 
+	account, err = account.UpdateAvailableLimit(*operation, *amount)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &Transaction{
 		account:   *account,
 		operation: *operation,

@@ -20,6 +20,16 @@ func NewAmount(n float64) (*Amount, error) {
 	return &Amount{math.Trunc(n*100) / 100}, nil
 }
 
+func (a Amount) Increment(n Amount) (*Amount, error) {
+	value := a.Value() + n.Value()
+	return NewAmount(value)
+}
+
+func (a Amount) Decrement(n Amount) (*Amount, error) {
+	value := a.Value() - n.Value()
+	return NewAmount(value)
+}
+
 func (a Amount) Value() float64 {
 	return a.value
 }

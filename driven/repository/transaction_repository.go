@@ -21,10 +21,9 @@ func NewTransactionRepository(db *sql.DB) TransactionRepository {
 
 func (r TransactionRepository) Save(t *entity.Transaction) (*vo.Id, error) {
 	query := `
-		INSERT INTO transaction (account_id, operation_id, amount, event_date) 
-		VALUES (?, ?, ?, ?)
+		UPDATE account SET available_limit = ?
+		WHERE account.id = ?
 `
-
 	stmt, err := r.DB().Prepare(query)
 
 	if err != nil {
@@ -32,6 +31,25 @@ func (r TransactionRepository) Save(t *entity.Transaction) (*vo.Id, error) {
 	}
 
 	result, err := stmt.Exec(
+		t.Account().AvailableLimit().Value(),
+		t.Account().Id().Value())
+
+	if err != nil {
+		return nil, err
+	}
+
+	query = `
+		INSERT INTO transaction (account_id, operation_id, amount, event_date) 
+		VALUES (?, ?, ?, ?)
+`
+
+	stmt, err = r.DB().Prepare(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	result, err = stmt.Exec(
 		t.Account().Id().Value(),
 		t.Operation().Id(),
 		t.Amount().Value(),

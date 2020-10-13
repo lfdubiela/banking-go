@@ -39,13 +39,18 @@ func NewAccountRepository(db *sql.DB) AccountRepository {
 }
 
 func (r AccountRepository) Save(a *entity.Account) (*vo.Id, error) {
-	stmt, err := r.DB().Prepare("INSERT INTO account (document_number) VALUES (?)")
+	query := `INSERT INTO account (document_number, credit_limit, available_limit) VALUES (?, ?, ?)`
+
+	stmt, err := r.DB().Prepare(query)
 
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := stmt.Exec(a.Document().Number())
+	result, err := stmt.Exec(
+		a.Document().Number(),
+		a.CreditLimit().Value(),
+		a.AvailableLimit().Value())
 
 	if err != nil {
 		mysqlErr, ok := err.(*mysql.MySQLError)
@@ -74,11 +79,15 @@ func (r AccountRepository) Save(a *entity.Account) (*vo.Id, error) {
 }
 
 func (r AccountRepository) Find(id *vo.Id) (*entity.Account, error) {
-	q := `SELECT document_number FROM account WHERE id = ?`
+	var (
+		document  string
+		credit    float64
+		available float64
+	)
 
-	var document string
+	q := `SELECT document_number, credit_limit, available_limit FROM account WHERE id = ?`
 
-	err := r.DB().QueryRow(q, id.Value()).Scan(&document)
+	err := r.DB().QueryRow(q, id.Value()).Scan(&document, &credit, &available)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -87,7 +96,7 @@ func (r AccountRepository) Find(id *vo.Id) (*entity.Account, error) {
 		return nil, err
 	}
 
-	account, err := entity.NewAccount(document)
+	account, err := entity.NewAccount(document, credit, available)
 
 	log.Println(err, account)
 

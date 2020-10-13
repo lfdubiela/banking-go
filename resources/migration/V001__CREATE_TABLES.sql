@@ -4,7 +4,9 @@
 
 CREATE TABLE account (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    document_number VARCHAR(14) NOT NULL UNIQUE
+    document_number VARCHAR(14) NOT NULL UNIQUE,
+    credit_limit DECIMAL(8,2) NOT NULL,
+    available_limit DECIMAL(8,2) NOT NULL
 );
 
 CREATE TABLE transaction (

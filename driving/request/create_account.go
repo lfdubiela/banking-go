@@ -5,7 +5,8 @@ import (
 )
 
 type CreateAccount struct {
-	Document string `json:"document_number" validate:"required,document_number"`
+	Document    string  `json:"document_number" validate:"required"`
+	CreditLimit float64 `json:"credit_limit" validate:"required,gt=0"`
 }
 
 func NewCreateAccount(payload []byte) (*CreateAccount, error) {
